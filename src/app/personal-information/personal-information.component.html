@@ -1,0 +1,62 @@
+<fieldset
+  [formGroupName]="controlKey"
+  class="border rounded p-5 flex flex-col gap-y-3"
+>
+  <legend class="text-xl font-semibold">{{ label }}</legend>
+
+  <div class="form-field flex flex-col gap-y-2">
+    <label for="name" class="text-xl font-medium">Name</label>
+    <input
+      type="text"
+      formControlName="name"
+      id="name"
+      class="border rounded"
+    />
+    <div *ngIf="nameInvalid" class="text-rose-500">
+      <span
+        *ngIf="parentFormGroup.get(controlKey + '.name')?.hasError('required')"
+        >Name is required!</span
+      >
+    </div>
+  </div>
+
+  <div class="form-field flex flex-col gap-y-2">
+    <label for="email" class="text-xl font-medium">email</label>
+    <input
+      type="email"
+      formControlName="email"
+      id="email"
+      class="border rounded"
+    />
+    <div *ngIf="emailInvalid" class="text-rose-500">
+      <span
+        *ngIf="parentFormGroup.get(controlKey + '.email')?.hasError('required')"
+        >Email is required!</span
+      >
+      <span
+        *ngIf="parentFormGroup.get(controlKey + '.email')?.hasError('email')"
+        >Please enter a valid email address!</span
+      >
+    </div>
+  </div>
+
+  <div class="form-field flex flex-col gap-y-2">
+    <label for="phone" class="text-xl font-medium">Phone</label>
+    <input
+      type="number"
+      formControlName="phone"
+      id="phone"
+      class="border rounded"
+    />
+    <div *ngIf="phoneInvalid" class="text-rose-500">
+      <span
+        *ngIf="parentFormGroup.get(controlKey + '.phone')?.hasError('required')"
+        >Phone is required!</span
+      >
+      <span
+        *ngIf="parentFormGroup.get(controlKey + '.phone')?.hasError('pattern')"
+        >Please enter valid phone number!</span
+      >
+    </div>
+  </div>
+</fieldset>

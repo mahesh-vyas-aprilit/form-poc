@@ -1,0 +1,109 @@
+<section class="max-w-2xl mx-auto py-10">
+  <form [formGroup]="form" class="flex flex-col gap-y-5">
+    <!-- Personal Information Section -->
+    <div
+      formGroupName="personalInformation"
+      class="form-field flex flex-col gap-y-2"
+    >
+      <label for="name" class="text-xl font-medium">Name:</label>
+      <input
+        type="text"
+        id="name"
+        formControlName="name"
+        class="border rounded"
+      />
+      <div *ngIf="nameInvalid">
+        <span
+          *ngIf="form.get('personalInformation.name')?.hasError('required')"
+          class="text-rose-500"
+        >
+          Name is required</span
+        >
+      </div>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" formControlName="email" />
+      <div *ngIf="emailInvalid">
+        <span
+          *ngIf="form.get('personalInformation.email')?.hasError('required')"
+          class="text-rose-500"
+        >
+          Email is required.</span
+        >
+        <span
+          *ngIf="form.get('personalInformation.email')?.hasError('email')"
+          class="text-rose-500"
+        >
+          Please enter a valid email address.</span
+        >
+      </div>
+
+      <label for="phone">Phone:</label>
+      <input type="text" id="phone" formControlName="phone" />
+      <div *ngIf="phoneInvalid">
+        <span
+          *ngIf="form.get('personalInformation.phone')?.hasError('required')"
+          class="text-rose-500"
+        >
+          Phone is required.</span
+        >
+      </div>
+    </div>
+
+    <!-- Address Section -->
+    <div formGroupName="address">
+      <label for="streetAddress">Street Address:</label>
+      <input type="text" id="streetAddress" formControlName="streetAddress" />
+      <div *ngIf="streetAddressInvalid">
+        <span
+          *ngIf="form.get('address.streetAddress')?.hasError('required')"
+          class="text-rose-500"
+        >
+          Street Address is required.</span
+        >
+      </div>
+      <label for="city">City:</label>
+      <input type="text" id="city" formControlName="city" />
+      <div *ngIf="cityInvalid">
+        <span
+          *ngIf="form.get('address.city')?.hasError('required')"
+          class="text-rose-500"
+        >
+          City is required.</span
+        >
+      </div>
+      <label for="state">State:</label>
+      <input type="text" id="state" formControlName="state" />
+      <div *ngIf="stateInvalid">
+        <span
+          *ngIf="form.get('address.state')?.hasError('required')"
+          class="text-rose-500"
+        >
+          State is required.</span
+        >
+      </div>
+      <label for="zipCode">Zip Code:</label>
+      <input type="text" id="zipCode" formControlName="zipCode" />
+      <div *ngIf="zipCodeInvalid">
+        <span
+          *ngIf="form.get('address.zipCode')?.hasError('required')"
+          class="text-rose-500"
+        >
+          Zip Code is required.</span
+        >
+      </div>
+    </div>
+
+    <!-- Interests Section -->
+    <label>Interests:</label>
+    <div formArrayName="interests">
+      <div *ngFor="let interestControl of getInterestControls(); let i = index">
+        <input type="text" [formControlName]="i" />
+        <button type="button" (click)="removeInterest(i)">Remove</button>
+      </div>
+      <button type="button" (click)="addInterest()">Add Interest</button>
+    </div>
+
+    <button (click)="handleSubmit()">Submit</button>
+  </form>
+</section>

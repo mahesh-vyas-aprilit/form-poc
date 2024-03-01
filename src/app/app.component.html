@@ -1,0 +1,63 @@
+<section class="max-w-2xl mx-auto py-10">
+  <form [formGroup]="form" class="flex flex-col gap-y-5">
+    <app-personal-information
+      controlKey="personalInformation"
+      label="Personal Information"
+      [submitted]="this.submitted"
+    />
+
+    <app-personal-information
+      controlKey="clientInformation"
+      label="Client Information"
+      [submitted]="this.submitted"
+    />
+
+    <app-address
+      controlKey="billingAddress"
+      label="Address"
+      [submitted]="this.submitted"
+    />
+
+    <app-address
+      controlKey="deliveryAddress"
+      label="Delivery Address"
+      [submitted]="this.submitted"
+    />
+
+    <!-- Interests Section -->
+    <div formArrayName="interests">
+      <div class="form-field flex flex-col gap-y-2">
+        <label class="text-xl font-medium">Interests:</label>
+        <div
+          *ngFor="let interestControl of getInterestControls(); let i = index"
+          class="flex items-center gap-x-5"
+        >
+          <input type="text" [formControlName]="i" class="border rounded" />
+          <button
+            type="button"
+            (click)="removeInterest(i)"
+            class="text-white bg-rose-500 py-1 px-2 rounded disabled:bg-rose-300"
+            [disabled]="getInterestControls().length === 1"
+          >
+            Remove
+          </button>
+        </div>
+        <button
+          type="button"
+          (click)="addInterest()"
+          class="w-fit text-white bg-green-500 py-1 px-2 rounded disabled:bg-green-300"
+        >
+          Add Interest
+        </button>
+      </div>
+    </div>
+
+    <button
+      (click)="handleSubmit()"
+      class="w-fit bg-blue-500 text-white py-1 px-2 rounded disabled:bg-blue-300"
+      [disabled]="!this.form.valid"
+    >
+      Submit
+    </button>
+  </form>
+</section>
