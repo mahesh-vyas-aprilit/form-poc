@@ -1,31 +1,25 @@
 <section class="max-w-2xl mx-auto py-10">
   <form [formGroup]="form" class="flex flex-col gap-y-5">
     <app-personal-information
-      controlKey="personalInformation"
+
       label="Personal Information"
-      [submitted]="this.submitted"
+      formControlName="personalInfo"
     />
 
     <app-personal-information
-      controlKey="clientInformation"
-      label="Client Information"
-      [submitted]="this.submitted"
+
+      label="Personal Information"
+      formControlName="clientInfo"
     />
 
-    <app-address
-      controlKey="billingAddress"
-      label="Address"
-      [submitted]="this.submitted"
-    />
+    <div *ngIf="form.hasError('nameEqual')" class="text-red-500">
+    Name Match
+    </div>
 
-    <app-address
-      controlKey="deliveryAddress"
-      label="Delivery Address"
-      [submitted]="this.submitted"
-    />
+
 
     <!-- Interests Section -->
-    <div formArrayName="interests">
+    <!-- <div formArrayName="interests">
       <div class="form-field flex flex-col gap-y-2">
         <label class="text-xl font-medium">Interests:</label>
         <div
@@ -50,7 +44,7 @@
           Add Interest
         </button>
       </div>
-    </div>
+    </div> -->
 
     <button
       (click)="handleSubmit()"
@@ -61,3 +55,5 @@
     </button>
   </form>
 </section>
+
+<pre>{{form.value | json}}</pre>

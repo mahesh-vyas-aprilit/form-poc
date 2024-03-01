@@ -1,5 +1,5 @@
 <fieldset
-  [formGroupName]="controlKey"
+  [formGroup]="parentFormGroup"
   class="border rounded p-5 flex flex-col gap-y-3"
 >
   <legend class="text-xl font-semibold">{{ label }}</legend>
@@ -12,11 +12,11 @@
       id="name"
       class="border rounded"
     />
-    <div *ngIf="nameInvalid" class="text-rose-500">
-      <span
-        *ngIf="parentFormGroup.get(controlKey + '.name')?.hasError('required')"
-        >Name is required!</span
-      >
+    <div
+      *ngIf="parentFormGroup.controls.name.hasError('required')"
+      class="text-rose-500"
+    >
+      Name is required!
     </div>
   </div>
 
@@ -28,13 +28,13 @@
       id="email"
       class="border rounded"
     />
-    <div *ngIf="emailInvalid" class="text-rose-500">
+    <div *ngIf="parentFormGroup.controls.email.errors" class="text-rose-500">
       <span
-        *ngIf="parentFormGroup.get(controlKey + '.email')?.hasError('required')"
+        *ngIf="parentFormGroup.controls.email.hasError('required')"
         >Email is required!</span
       >
       <span
-        *ngIf="parentFormGroup.get(controlKey + '.email')?.hasError('email')"
+        *ngIf="parentFormGroup.controls.email.hasError('email')"
         >Please enter a valid email address!</span
       >
     </div>
@@ -48,14 +48,14 @@
       id="phone"
       class="border rounded"
     />
-    <div *ngIf="phoneInvalid" class="text-rose-500">
+    <div *ngIf="parentFormGroup.controls.phone.errors" class="text-rose-500">
       <span
-        *ngIf="parentFormGroup.get(controlKey + '.phone')?.hasError('required')"
-        >Phone is required!</span
+        *ngIf="parentFormGroup.controls.phone.hasError('required')"
+        >phone is required!</span
       >
       <span
-        *ngIf="parentFormGroup.get(controlKey + '.phone')?.hasError('pattern')"
-        >Please enter valid phone number!</span
+        *ngIf="parentFormGroup.controls.phone.hasError('pattern')"
+        >Please enter a valid phone!</span
       >
     </div>
   </div>

@@ -1,13 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, inject } from '@angular/core';
 import {
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+  forwardRef,
+  inject,
+} from '@angular/core';
+import {
+  AbstractControl,
   ControlContainer,
+  ControlValueAccessor,
+  FormBuilder,
   FormControl,
   FormGroup,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
+  ValidationErrors,
+  Validator,
   Validators,
 } from '@angular/forms';
 import { phoneRegex } from '../../config/regex';
+import {
+  IGenericCommand,
+  IGenericForm,
+} from '../shared/commands/generic-form.command';
+import { debounce, debounceTime, map } from 'rxjs';
 
 @Component({
   selector: 'app-personal-information',
@@ -15,54 +34,78 @@ import { phoneRegex } from '../../config/regex';
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './personal-information.component.html',
   styleUrl: './personal-information.component.css',
-  // magic
-  viewProviders: [
+  providers: [
     {
-      provide: ControlContainer,
-      useFactory: () => inject(ControlContainer, { skipSelf: true }), //using skip self to prevent circular dependecy issue.
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => PersonalInformationComponent),
+      multi: true,
+    },
+    {
+      provide: NG_VALIDATORS,
+      multi: true,
+      useExisting: PersonalInformationComponent,
     },
   ],
 })
-export class PersonalInformationComponent {
-  @Input({ required: true }) controlKey = '';
+export class PersonalInformationComponent
+  implements OnInit, OnDestroy, ControlValueAccessor, Validator
+{
   @Input() label = '';
-  @Input() submitted = false;
-  parentContainer = inject(ControlContainer);
 
-  get parentFormGroup() {
-    return this.parentContainer?.control as FormGroup;
+  parentFormGroup!: IGenericForm;
+  value: IGenericCommand | null = null;
+  touched = false;
+  onTouched = () => {};
+  onChange = (val: IGenericCommand | null) => {};
+  constructor(private fb: FormBuilder) {}
+  ngOnDestroy(): void {}
+  writeValue(obj: IGenericCommand | null): void {
+    this.parentFormGroup.patchValue({
+      email: obj?.email,
+      name: obj?.name,
+      phone: obj?.phone,
+    });
+    this.value = obj;
   }
-
-  get nameInvalid() {
-    const nameControl = this.parentFormGroup.get(this.controlKey + '.name');
-    return nameControl?.invalid && (nameControl.dirty || nameControl.touched);
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+    this.parentFormGroup.valueChanges
+      .pipe(debounceTime(300), )
+      .subscribe((val) => {
+        this.onChange({ name: val.name ?? '', email: val.email ?? '', phone: val.phone ?? '' })
+      });
   }
-
-  get emailInvalid() {
-    const emailControl = this.parentFormGroup.get(this.controlKey + '.email');
-    return (
-      emailControl?.invalid && (emailControl.dirty || emailControl.touched)
-    );
+  registerOnTouched(fn: any): void {
+    this.touched = true;
+    this.onTouched = fn;
   }
+  setDisabledState?(isDisabled: boolean): void {
+    if (isDisabled) {
+      this.parentFormGroup.disable();
+    } else {
+      this.parentFormGroup.enable();
+    }
+  }
+  validate(control: AbstractControl<any, any>): ValidationErrors | null {
+    // return this.parentFormGroup.errors;
+    return null;
+  }
+  registerOnValidatorChange?(fn: () => void): void {
 
-  get phoneInvalid() {
-    const phoneControl = this.parentFormGroup.get(this.controlKey + '.phone');
-    return (
-      phoneControl?.invalid && (phoneControl.dirty || phoneControl.touched)
-    );
   }
 
   ngOnInit() {
-    this.parentFormGroup.addControl(
-      this.controlKey,
-      new FormGroup({
-        name: new FormControl('', Validators.required),
-        email: new FormControl('', [Validators.required, Validators.email]),
-        phone: new FormControl('', [
-          Validators.required,
-          Validators.pattern(phoneRegex),
-        ]),
-      })
-    );
+    this.parentFormGroup = this.fb.nonNullable.group({
+      name: this.fb.nonNullable.control<string>('', Validators.required),
+      email: this.fb.nonNullable.control<string>('', [
+        Validators.required,
+        Validators.email,
+      ]),
+      phone: this.fb.nonNullable.control<string>('', [
+        Validators.required,
+        Validators.pattern(phoneRegex),
+      ]),
+    });
+
   }
 }

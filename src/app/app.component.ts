@@ -4,13 +4,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 
 import {
+  AbstractControl,
   FormArray,
+  FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
 } from '@angular/forms';
 import { AddressComponent } from './address/address.component';
 import { PersonalInformationComponent } from './personal-information/personal-information.component';
+import { IGenericCommand } from './shared/commands/generic-form.command';
+import { IParentForm } from './shared/commands/parent-form.command';
 
 @Component({
   selector: 'app-root',
@@ -27,26 +32,29 @@ import { PersonalInformationComponent } from './personal-information/personal-in
   styleUrl: './app.component.css',
 })
 export class AppComponent implements OnInit {
-  form!: FormGroup;
+  form!: IParentForm;
   submitted = false;
+  constructor(private fb: FormBuilder){}
   ngOnInit(): void {
-    this.form = new FormGroup({
-      interests: new FormArray(
-        [''].map((interest) => new FormControl(interest))
-      ),
-    });
+    this.form = this.fb.nonNullable.group({
+      personalInfo: this.fb.nonNullable.control<IGenericCommand | null>(null),
+      clientInfo: this.fb.nonNullable.control<IGenericCommand | null>(null),
+    }, {validators: this.validateForm});
   }
 
-  addInterest() {
-    (this.form.get('interests') as FormArray).push(new FormControl(''));
-  }
-
-  removeInterest(index: number) {
-    (this.form.get('interests') as FormArray).removeAt(index);
-  }
-
-  getInterestControls() {
-    return (this.form.get('interests') as FormArray).controls;
+  validateForm(form: AbstractControl): ValidationErrors | null{
+    if (!form.value.personalInfo || !form.value.clientInfo) {
+      return null;
+    }
+    if (form.value.personalInfo && form.value.clientInfo) {
+      if (form.value.personalInfo.name === form.value.clientInfo.name) {
+        return {nameEqual: true}
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   handleSubmit() {
@@ -54,11 +62,11 @@ export class AppComponent implements OnInit {
     if (this.form.valid) {
       console.log(this.form.value);
 
-      const interestsArray = this.form.get('interests') as FormArray;
-      while (interestsArray.length !== 0) {
-        interestsArray.removeAt(0);
-      }
-      [''].forEach(() => interestsArray.push(new FormControl('')));
+    //  const interestsArray = this.form.get('interests') as FormArray;
+      // while (interestsArray.length !== 0) {
+      //   interestsArray.removeAt(0);
+      // }
+      // [''].forEach(() => interestsArray.push(new FormControl('')));
 
       this.form.reset();
       this.form.markAsUntouched();
